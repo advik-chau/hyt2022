@@ -1,0 +1,110 @@
+{% include "header.html" %}
+
+<script language="JavaScript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    windowHeight = $(window).height() * 0.5;
+    windowWidth = $(window).width() * 0.8;
+</script>
+
+<div>
+    <video id="videoOCR" playsinline autoplay></video>
+</div>
+
+<div style="text-align: center;">
+    <button type="submit" method="post" id="takePicture" >Capture</button>
+</div>
+<!-- 
+<form action="consumptionHabits.php" method="post">
+    <input type="submit" name="analyseImg" value="GO" />
+</form> -->
+
+<canvas id="canvasOCR" style="background-color: gray;">
+</canvas>
+<!-- <button>Toggle Camera</button> -->
+<p style="text-align: center;">Please take an image for analysis.</p>
+<script>
+    const canvas = document.getElementById('canvasOCR');
+    canvas.width = windowWidth;
+    canvas.height = windowHeight;
+    `use strict`;
+
+    const video = document.getElementById('videoOCR')
+
+    const constraints = {
+        audio: false,
+        video: {
+            width: windowWidth, //ideal: //gets max resolution
+            height: windowHeight
+        }
+    };
+
+    async function init() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            handleSuccess(stream);
+        } catch (e) {
+
+        }
+    }
+
+    function handleSuccess(stream) {
+        window.stream = stream;
+        video.srcObject = stream;
+    }
+
+    init();
+
+    var context = canvas.getContext('2d');
+    takePicture.addEventListener("click", function() {
+        context.drawImage(video, 0, 0, windowWidth, windowHeight)
+        imgData = canvas.toDataURL("image/png")
+        //localStorage.setItem("imgData", imgData);
+        var jsonData = {
+        'imgDataJson': imgData
+        }
+
+        $.ajax({
+        url: '/habits',
+        traditional: "true",
+        type: 'POST',
+        dataType: "json",
+        
+        data: JSON.stringify(jsonData),   // converts js value to JSON string
+        success: function(response){
+            if(response.data == 'success'){
+                window.location.replace('/userHome');
+            }else{
+            
+                alert('there was an error!');
+            }
+        }
+
+        }).done(function(result){     // on success get the return object from server
+            window.location.replace('/userHome');
+            console.log(result);     // do whatever with it. In this case see it in console
+        })
+        /* $.ajax({
+            type: "POST",
+            /* url: "http://127.0.0.1:5000/habits", */
+            /* dataType: 'json',
+            data: 'http://127.0.0.1:5000',
+            success: function(data){
+                window.location.href = data;
+            }
+        }); /* */
+        /* $.ajax({
+        type: 'POST',
+        dataType: "json",
+        // make sure you respect the same origin policy with this url:
+        // http://en.wikipedia.org/wiki/Same_origin_policy
+        /* url: 'http://wikipedia.com/', */
+        /* url: "http://127.0.0.1:5000",
+        data: imgData */
+/*         success: function(){
+            alert('wow!' + imgData);
+        } 
+        }); */
+    })
+</script>
+
+{% include "footer.html" %}

@@ -1,0 +1,25 @@
+<html>
+<body id="parentID">
+	<video id="v" width="300" height="300"></video>
+	<input id="b" type="button" disabled="true" value="Take Picture"></input>
+	<canvas id="c" style="display:none;" width="300" height="300"></canvas>
+    <img src="sign.jpg">
+</body>
+<script>
+	navigator.getUserMedia({video: true}, function(stream) {
+		var video = document.getElementById("v");
+		var canvas = document.getElementById("c");
+		var button = document.getElementById("b");
+
+		video.srcObject = stream;
+        video.play();
+
+		button.disabled = false;
+		button.onclick = function() {
+			canvas.getContext("2d").drawImage(video, 0, 0, 900, 900, 0, 0, 900, 900);
+			var img = canvas.toDataURL("image/png");
+            document.getElementById("parentID").innerHTML+= `<img src=${img}>`
+		};
+	}, function(err) { alert("there was an error " + err)});
+</script>
+</html>

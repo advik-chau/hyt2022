@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Simple Capture Web camera image using WebcamJS and PHP - Pakainfo.com</title>
+	<style type="text/css">
+		body { font-family: Helvetica, sans-serif; }
+		h2, h3 { margin-top:0; }
+		form { margin-top: 16px; }
+		form > input { margin-right: 16px; }
+		#img_output { float:right; margin:21px; padding:21px; border:1px solid; background:#3d3d3d; }
+	</style>
+</head>
+<body>
+	<div id="img_output">Live captured image will Display here...</div>
+	
+	<h1>jQuery Capture Web camera image using WebcamJS and PHP - Pakainfo.com</h1>
+	<h3>Live Demo And Example Demonstrates simple Images 600x460 capture & display here</h3>
+	
+	<div id="live_camera"></div>
+	
+	<!-- First of all, include the simple Webcam.js External js Library -->
+	<script type="text/javascript" src="webcam.js"></script>
+	
+	<!-- Setting a few options settings and attach your web camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 600,
+			height: 460,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+		Webcam.attach( '#live_camera' );
+	</script>
+	
+	<!-- A Simple take images button for Your Live taking snaps -->
+	<form>
+		<input type=button value="Take Snapshot" onClick="get_take_snap()">
+	</form>
+	
+	<!-- javascript Code to handle best taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+		function get_take_snap() {
+			// Simple call the take some your selfi and some get your live image data
+			Webcam.snap( function(data_uri) {
+				// display img_output in page
+				
+					
+				Webcam.upload( data_uri, 'live_save_img.php', function(code, text) {
+					document.getElementById('img_output').innerHTML = 
+					'<h2>Here is your Display image:</h2>' + 
+					'<img src="'+text+'"/>';
+				} );	
+			} );
+		}
+	</script>
+	
+</body>
+</html>
+
+<?php
+
+//Simple Rename any random name for the Your image, used any time() for random uniqueness
+
+$myfilename =  time() . '.jpg';
+$livefilepath = 'media_save/';
+
+move_uploaded_file($_FILES['webcam']['tmp_name'], $livefilepath.$myfilename);
+
+echo $livefilepath.$myfilename;
+?>
